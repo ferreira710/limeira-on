@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { createClient } from "@/utils/supabase/client";
 
-// Definições de tipos
 type Chamado = {
   id: string;
   titulo: string;
@@ -73,7 +72,6 @@ export default function Home() {
   const [atividadesRecentes, setAtividadesRecentes] = useState<Atividade[]>([]);
   const [loadingAtividades, setLoadingAtividades] = useState(true);
 
-  // Buscar usuário logado
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser();
@@ -82,7 +80,6 @@ export default function Home() {
     getUser();
   }, [supabase]);
 
-  // Buscar chamados e sugestões recentes
   useEffect(() => {
     const fetchAtividades = async () => {
       try {
@@ -97,7 +94,6 @@ export default function Home() {
           return;
         }
 
-        // Buscar chamados
         const { data: chamados, error: chamadosError } = await supabase
           .from("chamados")
           .select("id, titulo, status, created_at, categoria")
@@ -107,7 +103,6 @@ export default function Home() {
 
         if (chamadosError) throw chamadosError;
 
-        // Buscar sugestões
         const { data: sugestoes, error: sugestoesError } = await supabase
           .from("sugestoes")
           .select("id, titulo, status, created_at, categoria")
@@ -117,7 +112,6 @@ export default function Home() {
 
         if (sugestoesError) throw sugestoesError;
 
-        // Combinar e ordenar por data
         const chamadosComTipo: Atividade[] = (chamados || []).map((c) => ({
           ...c,
           tipo: "chamado" as const,
@@ -201,7 +195,6 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50/50 p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto">
-        {/* ===== 1. HEADER ===== */}
         <header className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <div className="bg-green-600 w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">
@@ -239,7 +232,6 @@ export default function Home() {
           </div>
         </header>
 
-        {/* ===== 2. BOAS-VINDAS ===== */}
         <div className="mb-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Olá{user ? `, ${user.email?.split("@")[0]}` : ", Cidadão!"} 👋
@@ -251,7 +243,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* ===== 3. BOTÃO PRINCIPAL ===== */}
         <Link href={user ? "/novo-chamado" : "/login"} className="block w-full">
           <Button
             variant="destructive"
@@ -272,7 +263,6 @@ export default function Home() {
           </Button>
         </Link>
 
-        {/* ===== 4. ATALHOS RÁPIDOS ===== */}
         <div className="grid grid-cols-3 justify-center gap-3 mb-8">
           <Link href={user ? "/meus-chamados" : "/login"}>
             <Card className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-white shadow-sm">
@@ -312,7 +302,6 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* ===== 5. FEED DE ATIVIDADES ===== */}
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-800 text-sm sm:text-base">
             📋 Atividades Recentes
@@ -326,7 +315,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* Estado 1: Carregando */}
         {loadingAtividades && (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-green-600" />
@@ -334,7 +322,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Estado 2: Deslogado */}
         {!loadingAtividades && !user && (
           <Card className="border-dashed border-2 border-gray-200 bg-white/50">
             <CardContent className="p-6 text-center">
@@ -354,7 +341,6 @@ export default function Home() {
           </Card>
         )}
 
-        {/* Estado 3: Logado, mas sem atividades */}
         {!loadingAtividades && user && atividadesRecentes.length === 0 && (
           <Card className="border-dashed border-2 border-gray-200 bg-white/50">
             <CardContent className="p-6 text-center">
@@ -368,7 +354,6 @@ export default function Home() {
           </Card>
         )}
 
-        {/* Estado 4: Logado com atividades */}
         {!loadingAtividades && user && atividadesRecentes.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {atividadesRecentes.map((atividade) => {

@@ -1,4 +1,3 @@
-// src/app/login/page.tsx
 "use client";
 
 import { Loader2 } from "lucide-react";
@@ -24,7 +23,6 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          // Redireciona para a home após o login
           emailRedirectTo: `${window.location.origin}/`,
         },
       });
@@ -35,9 +33,6 @@ export default function LoginPage() {
       }
 
       setMessage("📧 Link mágico enviado! Verifique seu e-mail.");
-      // Aguarda a confirmação (o usuário clica no link e volta para o app)
-      // Podemos redirecionar automaticamente após alguns segundos, mas é melhor esperar o clique no e-mail.
-      // Vamos apenas orientar o usuário.
     } catch {
       setMessage("Erro inesperado. Tente novamente.");
     } finally {

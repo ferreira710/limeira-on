@@ -110,7 +110,6 @@ export default function ChamadoDetalhesPage() {
 
         <Card className="border-0 shadow-sm">
           <CardContent className="p-6 space-y-4">
-            {/* Status e Data */}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <Badge
                 variant={statusMap[chamado.status]?.variant}
@@ -124,7 +123,6 @@ export default function ChamadoDetalhesPage() {
               </div>
             </div>
 
-            {/* Categoria */}
             <div>
               <span className="text-sm font-medium text-gray-500">
                 Categoria
@@ -134,7 +132,6 @@ export default function ChamadoDetalhesPage() {
               </p>
             </div>
 
-            {/* Endereço */}
             <div>
               <span className="text-sm font-medium text-gray-500 flex items-center">
                 <MapPin className="w-4 h-4 mr-1" /> Endereço
@@ -142,7 +139,6 @@ export default function ChamadoDetalhesPage() {
               <p className="text-gray-800">{chamado.endereco}</p>
             </div>
 
-            {/* Descrição */}
             <div>
               <span className="text-sm font-medium text-gray-500">
                 Descrição
@@ -152,7 +148,6 @@ export default function ChamadoDetalhesPage() {
               </p>
             </div>
 
-            {/* Foto */}
             {chamado.foto_url && (
               <div>
                 <span className="text-sm font-medium text-gray-500 flex items-center">
@@ -166,7 +161,6 @@ export default function ChamadoDetalhesPage() {
               </div>
             )}
 
-            {/* Número do protocolo */}
             <div className="pt-4 border-t border-gray-100 text-xs text-gray-400">
               Protocolo #{chamado.id.slice(0, 8)}
             </div>

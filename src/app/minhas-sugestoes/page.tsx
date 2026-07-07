@@ -89,7 +89,6 @@ export default function MinhasSugestoesPage() {
   return (
     <main className="min-h-screen bg-gray-50/50 p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto">
-        {/* Cabeçalho */}
         <div className="flex items-center gap-3 mb-6">
           <Link href="/">
             <Button variant="ghost" size="icon" className="h-9 w-9">
@@ -101,7 +100,6 @@ export default function MinhasSugestoesPage() {
           </h1>
         </div>
 
-        {/* Barra de pesquisa */}
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
@@ -113,7 +111,6 @@ export default function MinhasSugestoesPage() {
           />
         </div>
 
-        {/* Filtros */}
         <div className="flex flex-wrap gap-2 pb-4 mb-4 border-b border-gray-200">
           {["todos", "pendente", "em_analise", "implementado", "recusado"].map(
             (status) => (
@@ -132,7 +129,6 @@ export default function MinhasSugestoesPage() {
           )}
         </div>
 
-        {/* Loading */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />

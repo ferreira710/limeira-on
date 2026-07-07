@@ -224,7 +224,6 @@ export default function AdminPage() {
   return (
     <main className="min-h-screen bg-gray-50/50 p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-6xl mx-auto">
-        {/* HEADER COM ÍCONE HOME */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-2">
             <Link href="/" title="Voltar para a página inicial">
@@ -266,7 +265,6 @@ export default function AdminPage() {
             </TabsTrigger>
           </TabsList>
 
-          {/* ========= ABA CHAMADOS ========= */}
           <TabsContent value="chamados" className="mt-4">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
               <Card className="border-0 shadow-sm bg-white">
@@ -409,7 +407,6 @@ export default function AdminPage() {
             )}
           </TabsContent>
 
-          {/* ========= ABA SUGESTÕES ========= */}
           <TabsContent value="sugestoes" className="mt-4">
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
               <Card className="border-0 shadow-sm bg-white">
@@ -491,7 +488,6 @@ export default function AdminPage() {
                             <h3 className="font-medium text-gray-800 truncate">
                               {sugestao.titulo}
                             </h3>
-                            {/* Botão de link para a página de detalhes da sugestão */}
                             <Link
                               href={`/sugestao/${sugestao.id}`}
                               target="_blank"

@@ -84,7 +84,6 @@ export default function NovoChamadoPage() {
     }
   };
 
-  // Função para obter a localização atual e preencher o endereço
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
       toast.warning("Seu navegador não suporta geolocalização.");
@@ -97,7 +96,6 @@ export default function NovoChamadoPage() {
       async (position) => {
         const { latitude, longitude } = position.coords;
         try {
-          // Usa a API Nominatim (OpenStreetMap) para geocodificação reversa
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=pt`
           );
@@ -191,7 +189,6 @@ export default function NovoChamadoPage() {
   return (
     <main className="min-h-screen bg-gray-50/50 p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto">
-        {/* Cabeçalho */}
         <div className="flex items-center gap-3 mb-6">
           <Link href="/">
             <Button variant="ghost" size="icon" className="h-9 w-9">
@@ -204,9 +201,7 @@ export default function NovoChamadoPage() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Grid: 2 colunas no Desktop */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-            {/* Título */}
             <div>
               <Label htmlFor="titulo">Título do problema</Label>
               <Input
@@ -221,7 +216,6 @@ export default function NovoChamadoPage() {
               )}
             </div>
 
-            {/* Categoria com Controller */}
             <div>
               <Label htmlFor="categoria">Categoria</Label>
               <Controller
@@ -258,7 +252,6 @@ export default function NovoChamadoPage() {
             </div>
           </div>
 
-          {/* Descrição */}
           <div>
             <Label htmlFor="descricao">Descrição detalhada</Label>
             <Textarea
@@ -274,9 +267,7 @@ export default function NovoChamadoPage() {
             )}
           </div>
 
-          {/* Grid: 2 colunas no Desktop */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-end">
-            {/* Endereço com botão de localização */}
             <div>
               <Label htmlFor="endereco">
                 Endereço (ou ponto de referência)
@@ -311,7 +302,6 @@ export default function NovoChamadoPage() {
               )}
             </div>
 
-            {/* Upload de foto */}
             <div>
               <Label htmlFor="foto">Foto do problema (opcional)</Label>
               <div className="flex flex-wrap items-center gap-3">
@@ -346,7 +336,6 @@ export default function NovoChamadoPage() {
             </div>
           </div>
 
-          {/* Botão enviar */}
           <Button
             type="submit"
             variant="green"

@@ -1,4 +1,3 @@
-// src/app/meus-chamados/page.tsx
 "use client";
 
 import { ArrowLeft, Loader2, Search } from "lucide-react";
@@ -38,7 +37,6 @@ export default function MeusChamadosPage() {
   const [busca, setBusca] = useState("");
   const supabase = createClient();
 
-  // Buscar chamados do Supabase
   useEffect(() => {
     const fetchChamados = async () => {
       try {
@@ -75,7 +73,6 @@ export default function MeusChamadosPage() {
     fetchChamados();
   }, [supabase]);
 
-  // Filtrar por status e busca
   const chamadosFiltrados = chamados.filter((chamado) => {
     const matchStatus = filtro === "todos" || chamado.status === filtro;
     const matchBusca =
@@ -84,7 +81,6 @@ export default function MeusChamadosPage() {
     return matchStatus && matchBusca;
   });
 
-  // Formatar data
   const formatarData = (data: string) => {
     return new Date(data).toLocaleDateString("pt-BR", {
       day: "2-digit",
@@ -96,7 +92,6 @@ export default function MeusChamadosPage() {
   return (
     <main className="min-h-screen bg-gray-50/50 p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto">
-        {/* Cabeçalho */}
         <div className="flex items-center gap-3 mb-6">
           <Link href="/">
             <Button variant="ghost" size="icon" className="h-9 w-9">
@@ -108,7 +103,6 @@ export default function MeusChamadosPage() {
           </h1>
         </div>
 
-        {/* Barra de pesquisa */}
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
@@ -120,7 +114,6 @@ export default function MeusChamadosPage() {
           />
         </div>
 
-        {/* Filtros */}
         <div className="flex flex-wrap gap-2 pb-4 mb-4 border-b border-gray-200">
           {["todos", "aberto", "em_andamento", "concluido"].map((status) => (
             <Button
@@ -137,7 +130,6 @@ export default function MeusChamadosPage() {
           ))}
         </div>
 
-        {/* Loading */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-green-600" />

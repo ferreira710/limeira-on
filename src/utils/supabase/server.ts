@@ -1,4 +1,3 @@
-// src/lib/supabase/server.ts
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
@@ -23,7 +22,6 @@ export async function createClient() {
               cookieStore.set(name, value, options);
             });
           } catch {
-            // Ocorre em Server Components se a ação de middleware não for executada
           }
         },
       },

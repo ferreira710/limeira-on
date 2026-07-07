@@ -108,7 +108,6 @@ export default function SugestaoDetalhesPage() {
 
         <Card className="border-0 shadow-sm">
           <CardContent className="p-6 space-y-4">
-            {/* Status e Data */}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <Badge
                 variant={statusMap[sugestao.status]?.variant}
@@ -122,7 +121,6 @@ export default function SugestaoDetalhesPage() {
               </div>
             </div>
 
-            {/* Categoria */}
             <div>
               <span className="text-sm font-medium text-gray-500">
                 Categoria
@@ -132,7 +130,6 @@ export default function SugestaoDetalhesPage() {
               </p>
             </div>
 
-            {/* Descrição */}
             <div>
               <span className="text-sm font-medium text-gray-500">
                 Descrição
@@ -142,7 +139,6 @@ export default function SugestaoDetalhesPage() {
               </p>
             </div>
 
-            {/* Número do protocolo */}
             <div className="pt-4 border-t border-gray-100 text-xs text-gray-400">
               Protocolo #{sugestao.id.slice(0, 8)}
             </div>
