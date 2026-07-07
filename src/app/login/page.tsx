@@ -30,7 +30,7 @@ export default function LoginPage() {
       });
 
       if (error) {
-        setMessage("Erro: " + error.message);
+        setMessage(`Erro: ${error.message}`);
         return;
       }
 
@@ -38,21 +38,11 @@ export default function LoginPage() {
       // Aguarda a confirmação (o usuário clica no link e volta para o app)
       // Podemos redirecionar automaticamente após alguns segundos, mas é melhor esperar o clique no e-mail.
       // Vamos apenas orientar o usuário.
-    } catch (error) {
+    } catch {
       setMessage("Erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
     }
-  };
-
-  // Opção de login com e-mail/senha (mais simples para teste)
-  const handleLoginWithPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
-
-    // Para teste, use um e-mail e senha fixos ou crie um formulário com senha.
-    // Mas vou implementar com magic link que é mais seguro.
   };
 
   return (

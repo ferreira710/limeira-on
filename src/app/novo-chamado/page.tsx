@@ -1,16 +1,23 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Camera, Loader2 } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, MapPin } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/utils/supabase/client";
 
@@ -29,15 +36,23 @@ export default function NovoChamadoPage() {
   const router = useRouter();
   const [foto, setFoto] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
   const supabase = createClient();
 
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setValue,
   } = useForm<ChamadoFormData>({
     resolver: zodResolver(chamadoSchema),
+    defaultValues: {
+      titulo: "",
+      categoria: "",
+      descricao: "",
+      endereco: "",
+    },
   });
 
   const uploadFoto = async (file: File): Promise<string | null> => {
@@ -69,26 +84,68 @@ export default function NovoChamadoPage() {
     }
   };
 
+  // Função para obter a localização atual e preencher o endereço
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.warning("Seu navegador não suporta geolocalização.");
+      return;
+    }
+
+    setIsLoadingAddress(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          // Usa a API Nominatim (OpenStreetMap) para geocodificação reversa
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=pt`
+          );
+          const data = await response.json();
+
+          if (data?.display_name) {
+            setValue("endereco", data.display_name);
+            toast.success("Endereço obtido com sucesso!");
+          } else {
+            toast.error("Não foi possível obter o endereço.");
+          }
+        } catch (error) {
+          console.error("Erro na geocodificação:", error);
+          toast.error("Erro ao buscar endereço. Tente novamente.");
+        } finally {
+          setIsLoadingAddress(false);
+        }
+      },
+      (error) => {
+        console.error("Erro de geolocalização:", error);
+        toast.error("Não foi possível obter sua localização. Verifique as permissões.");
+        setIsLoadingAddress(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  };
+
   const onSubmit = async (data: ChamadoFormData) => {
     try {
-      // 1. Pegar o usuário logado
       const {
         data: { user },
         error: userError,
       } = await supabase.auth.getUser();
 
       if (userError || !user) {
-        alert("Você precisa estar logado para abrir um chamado.");
+        toast.error("Você precisa estar logado para abrir um chamado.");
         return;
       }
 
-      // 2. Fazer upload da foto (se houver)
       let fotoUrl: string | null = null;
       if (foto) {
         fotoUrl = await uploadFoto(foto);
       }
 
-      // 3. Inserir no banco
       const { error: insertError } = await supabase.from("chamados").insert({
         user_id: user.id,
         titulo: data.titulo,
@@ -101,22 +158,22 @@ export default function NovoChamadoPage() {
 
       if (insertError) {
         console.error("Erro ao inserir:", insertError);
-        alert("Erro ao salvar o chamado. Tente novamente.");
+        toast.error("Erro ao salvar o chamado. Tente novamente.");
         return;
       }
 
-      alert("✅ Chamado registrado com sucesso!");
+      toast.success("Chamado registrado com sucesso!");
       reset();
       setFoto(null);
       router.push("/meus-chamados");
     } catch (error) {
       console.error("Erro:", error);
-      alert("Erro ao processar o chamado.");
+      toast.error("Erro ao processar o chamado.");
     }
   };
 
   const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       setFoto(e.target.files[0]);
     }
   };
@@ -155,7 +212,7 @@ export default function NovoChamadoPage() {
               <Input
                 id="titulo"
                 placeholder="Ex: Buraco na rua"
-                {...register("titulo")}
+                {...control.register("titulo")}
               />
               {errors.titulo && (
                 <p className="text-sm text-red-500 mt-1">
@@ -164,21 +221,35 @@ export default function NovoChamadoPage() {
               )}
             </div>
 
-            {/* Categoria */}
+            {/* Categoria com Controller */}
             <div>
               <Label htmlFor="categoria">Categoria</Label>
-              <Select id="categoria" {...register("categoria")}>
-                <option value="">Selecione...</option>
-                <option value="infraestrutura">
-                  Infraestrutura (buracos, calçadas)
-                </option>
-                <option value="iluminacao">Iluminação pública</option>
-                <option value="lixo">Coleta de lixo / entulho</option>
-                <option value="area-verde">
-                  Áreas verdes (podas, jardinagem)
-                </option>
-                <option value="outros">Outros</option>
-              </Select>
+              <Controller
+                name="categoria"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="categoria">
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="infraestrutura">
+                        Infraestrutura (buracos, calçadas)
+                      </SelectItem>
+                      <SelectItem value="iluminacao">
+                        Iluminação pública
+                      </SelectItem>
+                      <SelectItem value="lixo">
+                        Coleta de lixo / entulho
+                      </SelectItem>
+                      <SelectItem value="area-verde">
+                        Áreas verdes (podas, jardinagem)
+                      </SelectItem>
+                      <SelectItem value="outros">Outros</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.categoria && (
                 <p className="text-sm text-red-500 mt-1">
                   {errors.categoria.message}
@@ -194,7 +265,7 @@ export default function NovoChamadoPage() {
               id="descricao"
               placeholder="Descreva o problema com detalhes..."
               rows={4}
-              {...register("descricao")}
+              {...control.register("descricao")}
             />
             {errors.descricao && (
               <p className="text-sm text-red-500 mt-1">
@@ -205,16 +276,34 @@ export default function NovoChamadoPage() {
 
           {/* Grid: 2 colunas no Desktop */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-end">
-            {/* Endereço */}
+            {/* Endereço com botão de localização */}
             <div>
               <Label htmlFor="endereco">
                 Endereço (ou ponto de referência)
               </Label>
-              <Input
-                id="endereco"
-                placeholder="Ex: Rua XV de Novembro, 123"
-                {...register("endereco")}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="endereco"
+                  placeholder="Ex: Rua XV de Novembro, 123"
+                  className="flex-1"
+                  {...control.register("endereco")}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={getCurrentLocation}
+                  disabled={isLoadingAddress}
+                  className="flex-shrink-0"
+                  title="Usar localização atual"
+                >
+                  {isLoadingAddress ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <MapPin className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
               {errors.endereco && (
                 <p className="text-sm text-red-500 mt-1">
                   {errors.endereco.message}

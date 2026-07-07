@@ -1,9 +1,10 @@
 "use client";
 
-import { ExternalLink, Loader2, LogOut, RefreshCw } from "lucide-react";
+import { ArrowLeft, ExternalLink, Loader2, LogOut, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +22,7 @@ type Chamado = {
   id: string;
   titulo: string;
   endereco: string;
+  descricao: string;
   status: "aberto" | "em_andamento" | "concluido";
   created_at: string;
   user_id: string;
@@ -94,7 +96,6 @@ export default function AdminPage() {
     }
   }, [supabase]);
 
-  // Atualizar status de um chamado
   const updateChamadoStatus = async (id: string, novoStatus: ChamadoStatus) => {
     try {
       setUpdatingId(id);
@@ -105,19 +106,18 @@ export default function AdminPage() {
 
       if (error) throw error;
 
-      // Atualiza localmente sem recarregar tudo
       setChamados((prev) =>
         prev.map((c) => (c.id === id ? { ...c, status: novoStatus } : c)),
       );
+      toast.success("Status atualizado com sucesso!");
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
-      alert("Erro ao atualizar status. Tente novamente.");
+      toast.error("Erro ao atualizar status. Tente novamente.");
     } finally {
       setUpdatingId(null);
     }
   };
 
-  // Atualizar status de uma sugestão
   const updateSugestaoStatus = async (
     id: string,
     novoStatus: SugestaoStatus,
@@ -134,9 +134,10 @@ export default function AdminPage() {
       setSugestoes((prev) =>
         prev.map((s) => (s.id === id ? { ...s, status: novoStatus } : s)),
       );
+      toast.success("Status atualizado com sucesso!");
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
-      alert("Erro ao atualizar status. Tente novamente.");
+      toast.error("Erro ao atualizar status. Tente novamente.");
     } finally {
       setUpdatingId(null);
     }
@@ -187,7 +188,6 @@ export default function AdminPage() {
     router.push("/login");
   };
 
-  // Estatísticas
   const chamadosStats = {
     total: chamados.length,
     aberto: chamados.filter((c) => c.status === "aberto").length,
@@ -203,7 +203,6 @@ export default function AdminPage() {
     recusado: sugestoes.filter((s) => s.status === "recusado").length,
   };
 
-  // Filtros
   const chamadosFiltrados =
     filterChamadoStatus === "todos"
       ? chamados
@@ -225,11 +224,18 @@ export default function AdminPage() {
   return (
     <main className="min-h-screen bg-gray-50/50 p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-6xl mx-auto">
-        {/* Header */}
+        {/* HEADER COM ÍCONE HOME */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            🏛️ Painel Administrativo
-          </h1>
+          <div className="flex items-center gap-2">
+            <Link href="/" title="Voltar para a página inicial">
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              🏛️ Painel Administrativo
+            </h1>
+          </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <Button
               variant="outline"
@@ -250,43 +256,6 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Estatísticas - Chamados */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-          <Card className="border-0 shadow-sm bg-white">
-            <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-gray-900">
-                {chamadosStats.total}
-              </p>
-              <p className="text-xs text-gray-500">Total chamados</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-sm bg-red-50">
-            <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-red-600">
-                {chamadosStats.aberto}
-              </p>
-              <p className="text-xs text-red-500">Abertos</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-sm bg-yellow-50">
-            <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-yellow-600">
-                {chamadosStats.em_andamento}
-              </p>
-              <p className="text-xs text-yellow-500">Em andamento</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-sm bg-green-50">
-            <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-green-600">
-                {chamadosStats.concluido}
-              </p>
-              <p className="text-xs text-green-500">Concluídos</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tabs */}
         <Tabs defaultValue="chamados" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="chamados">
@@ -297,16 +266,50 @@ export default function AdminPage() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Aba Chamados */}
+          {/* ========= ABA CHAMADOS ========= */}
           <TabsContent value="chamados" className="mt-4">
-            {/* Filtro */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+              <Card className="border-0 shadow-sm bg-white">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-gray-900">
+                    {chamadosStats.total}
+                  </p>
+                  <p className="text-xs text-gray-500">Total</p>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-sm bg-red-50">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-red-600">
+                    {chamadosStats.aberto}
+                  </p>
+                  <p className="text-xs text-red-500">Abertos</p>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-sm bg-yellow-50">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {chamadosStats.em_andamento}
+                  </p>
+                  <p className="text-xs text-yellow-500">Em andamento</p>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-sm bg-green-50">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-green-600">
+                    {chamadosStats.concluido}
+                  </p>
+                  <p className="text-xs text-green-500">Concluídos</p>
+                </CardContent>
+              </Card>
+            </div>
+
             <div className="flex items-center gap-3 mb-4">
               <span className="text-sm text-gray-500 font-medium">
                 Filtrar:
               </span>
               <Select
                 value={filterChamadoStatus}
-                onValueChange={(value: any) =>
+                onValueChange={(value) =>
                   setFilterChamadoStatus(value as ChamadoStatus | "todos")
                 }
               >
@@ -341,7 +344,6 @@ export default function AdminPage() {
                   >
                     <CardContent className="p-4">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        {/* Informações */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start gap-2">
                             <h3 className="font-medium text-gray-800 truncate">
@@ -359,35 +361,30 @@ export default function AdminPage() {
                             <span>{chamado.endereco}</span>
                             <span className="text-xs">•</span>
                             <span className="text-xs">
-                              {new Date(chamado.created_at).toLocaleDateString(
-                                "pt-BR",
-                              )}
+                              {new Date(chamado.created_at).toLocaleDateString("pt-BR")}
                             </span>
                             <span className="text-xs">•</span>
                             <span className="text-xs text-gray-400">
-                              {chamado.usuarios?.email ||
-                                "Usuário desconhecido"}
+                              {chamado.usuarios?.email || "Usuário desconhecido"}
                             </span>
                           </div>
+                          {chamado.descricao && (
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                              {chamado.descricao}
+                            </p>
+                          )}
                         </div>
-
-                        {/* Status + Select */}
                         <div className="flex items-center gap-3 flex-shrink-0">
                           <Badge
-                            variant={
-                              statusChamadoMap[chamado.status]?.variant as any
-                            }
+                            variant={statusChamadoMap[chamado.status]?.variant}
                             className="text-xs"
                           >
                             {statusChamadoMap[chamado.status]?.label}
                           </Badge>
                           <Select
                             value={chamado.status}
-                            onValueChange={(value: any) =>
-                              updateChamadoStatus(
-                                chamado.id,
-                                value as ChamadoStatus,
-                              )
+                            onValueChange={(value) =>
+                              updateChamadoStatus(chamado.id, value as ChamadoStatus)
                             }
                             disabled={updatingId === chamado.id}
                           >
@@ -396,12 +393,8 @@ export default function AdminPage() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="aberto">Aberto</SelectItem>
-                              <SelectItem value="em_andamento">
-                                Em andamento
-                              </SelectItem>
-                              <SelectItem value="concluido">
-                                Concluído
-                              </SelectItem>
+                              <SelectItem value="em_andamento">Em andamento</SelectItem>
+                              <SelectItem value="concluido">Concluído</SelectItem>
                             </SelectContent>
                           </Select>
                           {updatingId === chamado.id && (
@@ -416,16 +409,48 @@ export default function AdminPage() {
             )}
           </TabsContent>
 
-          {/* Aba Sugestões */}
+          {/* ========= ABA SUGESTÕES ========= */}
           <TabsContent value="sugestoes" className="mt-4">
-            {/* Filtro */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+              <Card className="border-0 shadow-sm bg-white">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-gray-900">{sugestoesStats.total}</p>
+                  <p className="text-xs text-gray-500">Total</p>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-sm bg-blue-50">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-blue-600">{sugestoesStats.pendente}</p>
+                  <p className="text-xs text-blue-500">Pendentes</p>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-sm bg-yellow-50">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-yellow-600">{sugestoesStats.em_analise}</p>
+                  <p className="text-xs text-yellow-500">Em análise</p>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-sm bg-green-50">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-green-600">{sugestoesStats.implementado}</p>
+                  <p className="text-xs text-green-500">Implementados</p>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-sm bg-red-50">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-red-600">{sugestoesStats.recusado}</p>
+                  <p className="text-xs text-red-500">Recusados</p>
+                </CardContent>
+              </Card>
+            </div>
+
             <div className="flex items-center gap-3 mb-4">
               <span className="text-sm text-gray-500 font-medium">
                 Filtrar:
               </span>
               <Select
                 value={filterSugestaoStatus}
-                onValueChange={(value: any) =>
+                onValueChange={(value) =>
                   setFilterSugestaoStatus(value as SugestaoStatus | "todos")
                 }
               >
@@ -462,9 +487,19 @@ export default function AdminPage() {
                     <CardContent className="p-4">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-gray-800 truncate">
-                            {sugestao.titulo}
-                          </h3>
+                          <div className="flex items-start gap-2">
+                            <h3 className="font-medium text-gray-800 truncate">
+                              {sugestao.titulo}
+                            </h3>
+                            {/* Botão de link para a página de detalhes da sugestão */}
+                            <Link
+                              href={`/sugestao/${sugestao.id}`}
+                              target="_blank"
+                              className="text-gray-400 hover:text-gray-600 flex-shrink-0"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Link>
+                          </div>
                           <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500 mt-0.5">
                             <span className="capitalize">
                               {sugestao.categoria}
@@ -485,11 +520,10 @@ export default function AdminPage() {
                             {sugestao.descricao}
                           </p>
                         </div>
-
                         <div className="flex items-center gap-3 flex-shrink-0">
                           <Badge
                             variant={
-                              statusSugestaoMap[sugestao.status]?.variant as any
+                              statusSugestaoMap[sugestao.status]?.variant
                             }
                             className="text-xs"
                           >
@@ -497,7 +531,7 @@ export default function AdminPage() {
                           </Badge>
                           <Select
                             value={sugestao.status}
-                            onValueChange={(value: any) =>
+                            onValueChange={(value) =>
                               updateSugestaoStatus(
                                 sugestao.id,
                                 value as SugestaoStatus,
@@ -531,42 +565,6 @@ export default function AdminPage() {
             )}
           </TabsContent>
         </Tabs>
-
-        {/* Estatísticas - Sugestões (abaixo das tabs) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-          <Card className="border-0 shadow-sm bg-white">
-            <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-gray-900">
-                {sugestoesStats.total}
-              </p>
-              <p className="text-xs text-gray-500">Total sugestões</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-sm bg-blue-50">
-            <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-blue-600">
-                {sugestoesStats.pendente}
-              </p>
-              <p className="text-xs text-blue-500">Pendentes</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-sm bg-yellow-50">
-            <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-yellow-600">
-                {sugestoesStats.em_analise}
-              </p>
-              <p className="text-xs text-yellow-500">Em análise</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-sm bg-green-50">
-            <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-green-600">
-                {sugestoesStats.implementado}
-              </p>
-              <p className="text-xs text-green-500">Implementados</p>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </main>
   );

@@ -5,11 +5,18 @@ import { ArrowLeft, Lightbulb, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/utils/supabase/client";
 
@@ -23,7 +30,7 @@ const sugestaoSchema = z.object({
 
 type SugestaoFormData = z.infer<typeof sugestaoSchema>;
 
-export default function SugestoesPage() {
+export default function NovaSugestaoPage() {
   const router = useRouter();
   const supabase = createClient();
   const {
@@ -44,7 +51,7 @@ export default function SugestoesPage() {
       } = await supabase.auth.getUser();
 
       if (userError || !user) {
-        alert("Você precisa estar logado para enviar uma sugestão.");
+        toast.error("Você precisa estar logado para enviar uma sugestão.");
         router.push("/login");
         return;
       }
@@ -59,16 +66,16 @@ export default function SugestoesPage() {
 
       if (insertError) {
         console.error(insertError);
-        alert("Erro ao enviar sugestão. Tente novamente.");
+        toast.error("Erro ao enviar sugestão. Tente novamente.");
         return;
       }
 
-      alert("✅ Sugestão enviada com sucesso!");
+      toast.success("Sugestão enviada com sucesso!");
       reset();
       router.push("/");
     } catch (error) {
       console.error(error);
-      alert("Erro inesperado.");
+      toast.error("Erro inesperado.");
     }
   };
 

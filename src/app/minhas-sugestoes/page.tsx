@@ -1,46 +1,44 @@
-// src/app/meus-chamados/page.tsx
 "use client";
 
-import { ArrowLeft, Loader2, Search } from "lucide-react";
+import { ArrowLeft, Lightbulb, Loader2, Search } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
 
-type Chamado = {
+type Sugestao = {
   id: string;
   titulo: string;
-  categoria: string;
   descricao: string;
-  endereco: string;
-  status: "aberto" | "em_andamento" | "concluido";
-  foto_url: string | null;
+  categoria: string;
+  status: "pendente" | "em_analise" | "implementado" | "recusado";
   created_at: string;
 };
 
-type BadgeVariant = React.ComponentProps<typeof Badge>["variant"];
+const statusMap = {
+  pendente: { label: "Pendente", variant: "outline" },
+  em_analise: { label: "Em análise", variant: "warning" },
+  implementado: { label: "Implementado", variant: "success" },
+  recusado: { label: "Recusado", variant: "destructive" },
+} as const;
 
-type Status = "aberto" | "em_andamento" | "concluido";
+type Status = keyof typeof statusMap;
 
-const statusMap: Record<Status, { label: string; variant: BadgeVariant }> = {
-  aberto: { label: "Aberto", variant: "destructive" },
-  em_andamento: { label: "Em andamento", variant: "warning" },
-  concluido: { label: "Concluído", variant: "success" },
-};
-
-export default function MeusChamadosPage() {
-  const [chamados, setChamados] = useState<Chamado[]>([]);
+export default function MinhasSugestoesPage() {
+  const router = useRouter();
+  const supabase = createClient();
+  const [sugestoes, setSugestoes] = useState<Sugestao[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState<Status | "todos">("todos");
   const [busca, setBusca] = useState("");
-  const supabase = createClient();
 
-  // Buscar chamados do Supabase
   useEffect(() => {
-    const fetchChamados = async () => {
+    const fetchSugestoes = async () => {
       try {
         setLoading(true);
         const {
@@ -49,42 +47,37 @@ export default function MeusChamadosPage() {
         } = await supabase.auth.getUser();
 
         if (userError || !user) {
-          setChamados([]);
+          router.push("/login");
           return;
         }
 
         const { data, error } = await supabase
-          .from("chamados")
+          .from("sugestoes")
           .select("*")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
 
-        if (error) {
-          console.error("Erro ao buscar chamados:", error);
-          return;
-        }
-
-        setChamados(data || []);
+        if (error) throw error;
+        setSugestoes(data || []);
       } catch (error) {
-        console.error("Erro:", error);
+        console.error("Erro ao buscar sugestões:", error);
+        toast.error("Erro ao carregar suas sugestões.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchChamados();
-  }, [supabase]);
+    fetchSugestoes();
+  }, [supabase, router]);
 
-  // Filtrar por status e busca
-  const chamadosFiltrados = chamados.filter((chamado) => {
-    const matchStatus = filtro === "todos" || chamado.status === filtro;
+  const sugestoesFiltradas = sugestoes.filter((s) => {
+    const matchStatus = filtro === "todos" || s.status === filtro;
     const matchBusca =
-      chamado.titulo.toLowerCase().includes(busca.toLowerCase()) ||
-      chamado.endereco.toLowerCase().includes(busca.toLowerCase());
+      s.titulo.toLowerCase().includes(busca.toLowerCase()) ||
+      s.descricao.toLowerCase().includes(busca.toLowerCase());
     return matchStatus && matchBusca;
   });
 
-  // Formatar data
   const formatarData = (data: string) => {
     return new Date(data).toLocaleDateString("pt-BR", {
       day: "2-digit",
@@ -104,7 +97,7 @@ export default function MeusChamadosPage() {
             </Button>
           </Link>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
-            Meus Chamados
+            Minhas Sugestões
           </h1>
         </div>
 
@@ -113,7 +106,7 @@ export default function MeusChamadosPage() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             type="text"
-            placeholder="Buscar por título ou endereço..."
+            placeholder="Buscar por título ou descrição..."
             className="pl-9 bg-white"
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
@@ -122,79 +115,74 @@ export default function MeusChamadosPage() {
 
         {/* Filtros */}
         <div className="flex flex-wrap gap-2 pb-4 mb-4 border-b border-gray-200">
-          {["todos", "aberto", "em_andamento", "concluido"].map((status) => (
-            <Button
-              key={status}
-              variant={filtro === status ? "green" : "outline"}
-              size="sm"
-              className="rounded-full px-4 text-sm capitalize"
-              onClick={() => setFiltro(status as Status | "todos")}
-            >
-              {status === "todos"
-                ? "Todos"
-                : statusMap[status as Status]?.label || status}
-            </Button>
-          ))}
+          {["todos", "pendente", "em_analise", "implementado", "recusado"].map(
+            (status) => (
+              <Button
+                key={status}
+                variant={filtro === status ? "blue" : "outline"}
+                size="sm"
+                className="rounded-full px-4 text-sm capitalize"
+                onClick={() => setFiltro(status as Status | "todos")}
+              >
+                {status === "todos"
+                  ? "Todos"
+                  : statusMap[status as Status]?.label || status}
+              </Button>
+            )
+          )}
         </div>
 
         {/* Loading */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+            <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
             <span className="ml-2 text-gray-500">Carregando...</span>
           </div>
-        ) : chamadosFiltrados.length === 0 ? (
+        ) : sugestoesFiltradas.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">Nenhum chamado encontrado</p>
+            <p className="text-gray-500">Nenhuma sugestão encontrada</p>
             <p className="text-xs text-gray-400 mt-1">
               {busca || filtro !== "todos"
                 ? "Tente ajustar os filtros ou a busca"
-                : "Você ainda não abriu nenhum chamado"}
+                : "Você ainda não enviou nenhuma sugestão"}
             </p>
             {!busca && filtro === "todos" && (
-              <Link href="/novo-chamado">
-                <Button variant="green" className="mt-4">
-                  Abrir meu primeiro chamado
+              <Link href="/sugestoes">
+                <Button variant="blue" className="mt-4">
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  Enviar minha primeira sugestão
                 </Button>
               </Link>
             )}
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            {chamadosFiltrados.map((chamado) => (
-              <Link href={`/chamado/${chamado.id}`} key={chamado.id}>
-                <Card
-                  key={chamado.id}
-                  className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                >
+            {sugestoesFiltradas.map((sugestao) => (
+              <Link href={`/sugestao/${sugestao.id}`} key={sugestao.id}>
+                <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-gray-800 text-sm sm:text-base truncate">
-                          {chamado.titulo}
+                          {sugestao.titulo}
                         </h3>
-                        <p className="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">
-                          {chamado.endereco}
+                        <p className="text-xs sm:text-sm text-gray-500 mt-0.5 line-clamp-2">
+                          {sugestao.descricao}
                         </p>
                         <div className="flex flex-wrap items-center gap-2 mt-2">
-                          <Badge
-                            variant={statusMap[chamado.status]?.variant}
-                          >
-                            {statusMap[chamado.status]?.label}
+                          <Badge variant={statusMap[sugestao.status]?.variant}>
+                            {statusMap[sugestao.status]?.label}
                           </Badge>
                           <span className="text-xs text-gray-400">
-                            {formatarData(chamado.created_at)}
+                            {formatarData(sugestao.created_at)}
                           </span>
-                          {chamado.foto_url && (
-                            <span className="text-xs text-blue-500">📷</span>
-                          )}
+                          <span className="text-xs text-gray-400 capitalize">
+                            • {sugestao.categoria.replace("-", " ")}
+                          </span>
                         </div>
                       </div>
-                      <Badge
-                        variant="outline"
-                        className="text-xs bg-gray-50 self-start shrink-0"
-                      >
-                        #{chamado.id.slice(0, 8)}
+                      <Badge variant="outline" className="text-xs bg-gray-50 self-start shrink-0">
+                        #{sugestao.id.slice(0, 8)}
                       </Badge>
                     </div>
                   </CardContent>

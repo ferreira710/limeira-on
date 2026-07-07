@@ -1,7 +1,6 @@
-/** biome-ignore-all lint/performance/noImgElement: <auto explain> */
 "use client";
 
-import { ArrowLeft, Calendar, Camera, Loader2, MapPin } from "lucide-react";
+import { ArrowLeft, Calendar, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -10,52 +9,51 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { createClient } from "@/utils/supabase/client";
 
-type Chamado = {
+type Sugestao = {
   id: string;
   titulo: string;
   categoria: string;
   descricao: string;
-  endereco: string;
-  status: "aberto" | "em_andamento" | "concluido";
-  foto_url: string | null;
+  status: "pendente" | "em_analise" | "implementado" | "recusado";
   created_at: string;
   user_id: string;
 };
 
 const statusMap = {
-  aberto: { label: "Aberto", variant: "destructive" },
-  em_andamento: { label: "Em andamento", variant: "warning" },
-  concluido: { label: "Concluído", variant: "success" },
+  pendente: { label: "Pendente", variant: "outline" },
+  em_analise: { label: "Em análise", variant: "warning" },
+  implementado: { label: "Implementado", variant: "success" },
+  recusado: { label: "Recusado", variant: "destructive" },
 } as const;
 
-export default function ChamadoDetalhesPage() {
+export default function SugestaoDetalhesPage() {
   const params = useParams();
   const supabase = createClient();
-  const [chamado, setChamado] = useState<Chamado | null>(null);
+  const [sugestao, setSugestao] = useState<Sugestao | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchChamado = async () => {
+    const fetchSugestao = async () => {
       try {
         setLoading(true);
         const { data, error } = await supabase
-          .from("chamados")
+          .from("sugestoes")
           .select("*")
           .eq("id", params.id)
           .single();
 
         if (error) throw error;
-        setChamado(data);
+        setSugestao(data);
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
-        setError(message || "Erro ao carregar chamado");
+        setError(message || "Erro ao carregar sugestão");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchChamado();
+    fetchSugestao();
   }, [params.id, supabase]);
 
   const formatarData = (data: string) => {
@@ -71,21 +69,21 @@ export default function ChamadoDetalhesPage() {
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
         <span className="ml-2 text-gray-500">Carregando...</span>
       </main>
     );
   }
 
-  if (error || !chamado) {
+  if (error || !sugestao) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <Card className="w-full max-w-md">
           <CardContent className="p-6 text-center">
-            <p className="text-red-500">{error || "Chamado não encontrado"}</p>
-            <Link href="/">
+            <p className="text-red-500">{error || "Sugestão não encontrada"}</p>
+            <Link href="/minhas-sugestoes">
               <Button variant="outline" className="mt-4">
-                Voltar para Home
+                Voltar para minhas sugestões
               </Button>
             </Link>
           </CardContent>
@@ -98,13 +96,13 @@ export default function ChamadoDetalhesPage() {
     <main className="min-h-screen bg-gray-50/50 p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-2xl lg:max-w-3xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
-          <Link href="/meus-chamados">
+          <Link href="/minhas-sugestoes">
             <Button variant="ghost" size="icon" className="h-9 w-9">
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-800 truncate">
-            {chamado.titulo}
+            {sugestao.titulo}
           </h1>
         </div>
 
@@ -113,14 +111,14 @@ export default function ChamadoDetalhesPage() {
             {/* Status e Data */}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <Badge
-                variant={statusMap[chamado.status]?.variant}
+                variant={statusMap[sugestao.status]?.variant}
                 className="text-sm"
               >
-                {statusMap[chamado.status]?.label}
+                {statusMap[sugestao.status]?.label}
               </Badge>
               <div className="flex items-center text-sm text-gray-500">
                 <Calendar className="w-4 h-4 mr-1" />
-                {formatarData(chamado.created_at)}
+                {formatarData(sugestao.created_at)}
               </div>
             </div>
 
@@ -130,16 +128,8 @@ export default function ChamadoDetalhesPage() {
                 Categoria
               </span>
               <p className="text-gray-800 capitalize">
-                {chamado.categoria.replace("-", " ")}
+                {sugestao.categoria.replace("-", " ")}
               </p>
-            </div>
-
-            {/* Endereço */}
-            <div>
-              <span className="text-sm font-medium text-gray-500 flex items-center">
-                <MapPin className="w-4 h-4 mr-1" /> Endereço
-              </span>
-              <p className="text-gray-800">{chamado.endereco}</p>
             </div>
 
             {/* Descrição */}
@@ -148,35 +138,21 @@ export default function ChamadoDetalhesPage() {
                 Descrição
               </span>
               <p className="text-gray-700 whitespace-pre-wrap">
-                {chamado.descricao}
+                {sugestao.descricao}
               </p>
             </div>
 
-            {/* Foto */}
-            {chamado.foto_url && (
-              <div>
-                <span className="text-sm font-medium text-gray-500 flex items-center">
-                  <Camera className="w-4 h-4 mr-1" /> Foto
-                </span>
-                <img
-                  src={chamado.foto_url}
-                  alt="Foto do problema"
-                  className="mt-2 rounded-lg max-h-96 w-full object-contain border border-gray-200"
-                />
-              </div>
-            )}
-
             {/* Número do protocolo */}
             <div className="pt-4 border-t border-gray-100 text-xs text-gray-400">
-              Protocolo #{chamado.id.slice(0, 8)}
+              Protocolo #{sugestao.id.slice(0, 8)}
             </div>
           </CardContent>
         </Card>
 
         <div className="mt-4">
-          <Link href="/meus-chamados">
+          <Link href="/minhas-sugestoes">
             <Button variant="outline" className="w-full">
-              Voltar para meus chamados
+              Voltar para minhas sugestões
             </Button>
           </Link>
         </div>
