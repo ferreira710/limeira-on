@@ -4,7 +4,6 @@ import type { User } from "@supabase/supabase-js";
 import {
   AlertTriangle,
   Building,
-  ChevronRight,
   Lightbulb,
   Loader2,
   LogIn,
@@ -180,13 +179,13 @@ export default function Home() {
     if (atividade.tipo === "chamado") {
       return (
         statusColorMap.chamado[
-        atividade.status as keyof typeof statusColorMap.chamado
+          atividade.status as keyof typeof statusColorMap.chamado
         ] || "bg-gray-400"
       );
     } else {
       return (
         statusColorMap.sugestao[
-        atividade.status as keyof typeof statusColorMap.sugestao
+          atividade.status as keyof typeof statusColorMap.sugestao
         ] || "bg-gray-400"
       );
     }
@@ -253,7 +252,10 @@ export default function Home() {
           </Button>
         </Link>
 
-        <Link href={user ? "/nova-sugestao" : "/login"} className="block w-full">
+        <Link
+          href={user ? "/nova-sugestao" : "/login"}
+          className="block w-full"
+        >
           <Button
             variant="blue"
             className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold shadow-lg shadow-yellow-500/20 transition-all flex items-center justify-center gap-2 mb-6 rounded-xl"
@@ -265,8 +267,8 @@ export default function Home() {
 
         <div className="grid grid-cols-3 justify-center gap-3 mb-8">
           <Link href={user ? "/meus-chamados" : "/login"}>
-            <Card className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-white shadow-sm">
-              <CardContent className="flex flex-col items-center justify-center p-4 sm:p-5 gap-1">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-white shadow-sm h-full">
+              <CardContent className="flex flex-col items-center justify-center p-4 sm:p-5 gap-1 min-h-24">
                 <MapPin className="w-6 h-6 sm:w-7 sm:h-7 text-green-600" />
                 <span className="text-xs sm:text-sm font-medium text-gray-700 text-center">
                   Meus Chamados
@@ -276,8 +278,8 @@ export default function Home() {
           </Link>
 
           <Link href={user ? "/minhas-sugestoes" : "/login"}>
-            <Card className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-white shadow-sm">
-              <CardContent className="flex flex-col items-center justify-center p-4 sm:p-5 gap-1">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-white shadow-sm h-full">
+              <CardContent className="flex flex-col items-center justify-center p-4 sm:p-5 gap-1 min-h-24">
                 <MessageSquare className="w-6 h-6 sm:w-7 sm:h-7 text-orange-600" />
                 <span className="text-xs sm:text-sm font-medium text-gray-700 text-center">
                   Minhas Sugestões
@@ -291,8 +293,8 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Card className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-white shadow-sm">
-              <CardContent className="flex flex-col items-center justify-center p-4 sm:p-5 gap-1">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-white shadow-sm h-full">
+              <CardContent className="flex flex-col items-center justify-center p-4 sm:p-5 gap-1 min-h-24">
                 <Building className="w-6 h-6 sm:w-7 sm:h-7 text-purple-600" />
                 <span className="text-xs sm:text-sm font-medium text-gray-700 text-center">
                   Obras
@@ -300,19 +302,6 @@ export default function Home() {
               </CardContent>
             </Card>
           </Link>
-        </div>
-
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-gray-800 text-sm sm:text-base">
-            📋 Atividades Recentes
-          </h3>
-          {user && atividadesRecentes.length > 0 && (
-            <Link href="/meus-chamados">
-              <span className="text-xs sm:text-sm text-green-600 font-medium flex items-center cursor-pointer">
-                Ver todos <ChevronRight className="w-4 h-4" />
-              </span>
-            </Link>
-          )}
         </div>
 
         {loadingAtividades && (
@@ -366,9 +355,7 @@ export default function Home() {
                 >
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div
-                        className={`w-2 h-2 rounded-full ${cor} flex-shrink-0`}
-                      />
+                      <div className={`w-2 h-2 rounded-full ${cor} shrink-0`} />
                       <div className="truncate">
                         <p className="text-sm font-medium text-gray-800 truncate flex items-center gap-1">
                           {atividade.titulo}
@@ -392,7 +379,7 @@ export default function Home() {
                     </div>
                     <Badge
                       variant={status.variant}
-                      className="flex-shrink-0 ml-2 text-xs"
+                      className="shrink-0 ml-2 text-xs"
                     >
                       {status.label}
                     </Badge>
