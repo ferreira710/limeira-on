@@ -8,19 +8,8 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import type { Chamado } from "@/types/chamado";
 import { createClient } from "@/utils/supabase/client";
-
-type Chamado = {
-  id: string;
-  titulo: string;
-  categoria: string;
-  descricao: string;
-  endereco: string;
-  status: "aberto" | "em_andamento" | "concluido";
-  foto_url: string | null;
-  created_at: string;
-  user_id: string;
-};
 
 const statusMap = {
   aberto: { label: "Aberto", variant: "destructive" },

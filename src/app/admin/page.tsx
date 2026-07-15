@@ -1,6 +1,12 @@
 "use client";
 
-import { ArrowLeft, ExternalLink, Loader2, LogOut, RefreshCw } from "lucide-react";
+import {
+  ArrowLeft,
+  ExternalLink,
+  Loader2,
+  LogOut,
+  RefreshCw,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -16,29 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { Chamado } from "@/types/chamado";
+import type { Sugestao } from "@/types/sugestao";
 import { createClient } from "@/utils/supabase/client";
-
-type Chamado = {
-  id: string;
-  titulo: string;
-  endereco: string;
-  descricao: string;
-  status: "aberto" | "em_andamento" | "concluido";
-  created_at: string;
-  user_id: string;
-  usuarios?: { email: string };
-};
-
-type Sugestao = {
-  id: string;
-  titulo: string;
-  descricao: string;
-  categoria: string;
-  status: "pendente" | "em_analise" | "implementado" | "recusado";
-  created_at: string;
-  user_id: string;
-  usuarios?: { email: string };
-};
 
 const statusChamadoMap = {
   aberto: { label: "Aberto", variant: "destructive" },
@@ -359,11 +345,14 @@ export default function AdminPage() {
                             <span>{chamado.endereco}</span>
                             <span className="text-xs">•</span>
                             <span className="text-xs">
-                              {new Date(chamado.created_at).toLocaleDateString("pt-BR")}
+                              {new Date(chamado.created_at).toLocaleDateString(
+                                "pt-BR",
+                              )}
                             </span>
                             <span className="text-xs">•</span>
                             <span className="text-xs text-gray-400">
-                              {chamado.usuarios?.email || "Usuário desconhecido"}
+                              {chamado.usuarios?.email ||
+                                "Usuário desconhecido"}
                             </span>
                           </div>
                           {chamado.descricao && (
@@ -382,7 +371,10 @@ export default function AdminPage() {
                           <Select
                             value={chamado.status}
                             onValueChange={(value) =>
-                              updateChamadoStatus(chamado.id, value as ChamadoStatus)
+                              updateChamadoStatus(
+                                chamado.id,
+                                value as ChamadoStatus,
+                              )
                             }
                             disabled={updatingId === chamado.id}
                           >
@@ -391,8 +383,12 @@ export default function AdminPage() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="aberto">Aberto</SelectItem>
-                              <SelectItem value="em_andamento">Em andamento</SelectItem>
-                              <SelectItem value="concluido">Concluído</SelectItem>
+                              <SelectItem value="em_andamento">
+                                Em andamento
+                              </SelectItem>
+                              <SelectItem value="concluido">
+                                Concluído
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                           {updatingId === chamado.id && (
@@ -411,31 +407,41 @@ export default function AdminPage() {
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
               <Card className="border-0 shadow-sm bg-white">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-gray-900">{sugestoesStats.total}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {sugestoesStats.total}
+                  </p>
                   <p className="text-xs text-gray-500">Total</p>
                 </CardContent>
               </Card>
               <Card className="border-0 shadow-sm bg-blue-50">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-blue-600">{sugestoesStats.pendente}</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {sugestoesStats.pendente}
+                  </p>
                   <p className="text-xs text-blue-500">Pendentes</p>
                 </CardContent>
               </Card>
               <Card className="border-0 shadow-sm bg-yellow-50">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-yellow-600">{sugestoesStats.em_analise}</p>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {sugestoesStats.em_analise}
+                  </p>
                   <p className="text-xs text-yellow-500">Em análise</p>
                 </CardContent>
               </Card>
               <Card className="border-0 shadow-sm bg-green-50">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-green-600">{sugestoesStats.implementado}</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {sugestoesStats.implementado}
+                  </p>
                   <p className="text-xs text-green-500">Implementados</p>
                 </CardContent>
               </Card>
               <Card className="border-0 shadow-sm bg-red-50">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-red-600">{sugestoesStats.recusado}</p>
+                  <p className="text-2xl font-bold text-red-600">
+                    {sugestoesStats.recusado}
+                  </p>
                   <p className="text-xs text-red-500">Recusados</p>
                 </CardContent>
               </Card>

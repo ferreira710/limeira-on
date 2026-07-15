@@ -7,17 +7,8 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import type { Sugestao } from "@/types/sugestao";
 import { createClient } from "@/utils/supabase/client";
-
-type Sugestao = {
-  id: string;
-  titulo: string;
-  categoria: string;
-  descricao: string;
-  status: "pendente" | "em_analise" | "implementado" | "recusado";
-  created_at: string;
-  user_id: string;
-};
 
 const statusMap = {
   pendente: { label: "Pendente", variant: "outline" },

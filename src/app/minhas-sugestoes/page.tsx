@@ -9,16 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import type { Sugestao } from "@/types/sugestao";
 import { createClient } from "@/utils/supabase/client";
-
-type Sugestao = {
-  id: string;
-  titulo: string;
-  descricao: string;
-  categoria: string;
-  status: "pendente" | "em_analise" | "implementado" | "recusado";
-  created_at: string;
-};
 
 const statusMap = {
   pendente: { label: "Pendente", variant: "outline" },
@@ -74,7 +66,7 @@ export default function MinhasSugestoesPage() {
     const matchStatus = filtro === "todos" || s.status === filtro;
     const matchBusca =
       s.titulo.toLowerCase().includes(busca.toLowerCase()) ||
-      s.descricao.toLowerCase().includes(busca.toLowerCase());
+      s.descricao?.toLowerCase().includes(busca.toLowerCase());
     return matchStatus && matchBusca;
   });
 
@@ -125,7 +117,7 @@ export default function MinhasSugestoesPage() {
                   ? "Todos"
                   : statusMap[status as Status]?.label || status}
               </Button>
-            )
+            ),
           )}
         </div>
 
@@ -177,7 +169,10 @@ export default function MinhasSugestoesPage() {
                           </span>
                         </div>
                       </div>
-                      <Badge variant="outline" className="text-xs bg-gray-50 self-start shrink-0">
+                      <Badge
+                        variant="outline"
+                        className="text-xs bg-gray-50 self-start shrink-0"
+                      >
                         #{sugestao.id.slice(0, 8)}
                       </Badge>
                     </div>

@@ -3,20 +3,23 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
+  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-white transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] cursor-pointer",
   {
     variants: {
       variant: {
-        default: "bg-gray-900 text-gray-50 hover:bg-gray-900/90",
-        destructive: "bg-red-500 text-gray-50 hover:bg-red-500/90",
+        default: "bg-gray-900 text-gray-50 hover:bg-gray-800",
+        destructive:
+          "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500",
         outline:
-          "border border-gray-200 bg-white hover:bg-gray-100 hover:text-gray-900",
-        secondary: "bg-gray-100 text-gray-900 hover:bg-gray-100/80",
+          "border border-gray-200 bg-white",
+        secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
         ghost: "hover:bg-gray-100 hover:text-gray-900",
         link: "text-gray-900 underline-offset-4 hover:underline",
-        green: "bg-green-600 text-white hover:bg-green-700",
-        blue: "bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500",
-
+        green:
+          "bg-green-600 text-white hover:bg-green-700 focus-visible:ring-green-500",
+        yellow:
+          "bg-yellow-500 text-white hover:bg-yellow-600 focus-visible:ring-yellow-500",
+        blue: "bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500",
       },
       size: {
         default: "h-10 px-4 py-2",

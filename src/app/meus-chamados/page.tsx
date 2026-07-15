@@ -7,18 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import type { Chamado } from "@/types/chamado";
 import { createClient } from "@/utils/supabase/client";
-
-type Chamado = {
-  id: string;
-  titulo: string;
-  categoria: string;
-  descricao: string;
-  endereco: string;
-  status: "aberto" | "em_andamento" | "concluido";
-  foto_url: string | null;
-  created_at: string;
-};
 
 type BadgeVariant = React.ComponentProps<typeof Badge>["variant"];
 
@@ -169,9 +159,7 @@ export default function MeusChamadosPage() {
                           {chamado.endereco}
                         </p>
                         <div className="flex flex-wrap items-center gap-2 mt-2">
-                          <Badge
-                            variant={statusMap[chamado.status]?.variant}
-                          >
+                          <Badge variant={statusMap[chamado.status]?.variant}>
                             {statusMap[chamado.status]?.label}
                           </Badge>
                           <span className="text-xs text-gray-400">
