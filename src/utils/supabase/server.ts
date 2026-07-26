@@ -8,9 +8,7 @@ export async function createClient() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   if (!url || !key) {
-    throw new Error(
-      "Missing environment variables",
-    );
+    throw new Error("Missing environment variables");
   }
 
   return createServerClient(url, key, {
