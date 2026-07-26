@@ -90,7 +90,9 @@ export default function Home() {
     const fetchAtividades = async () => {
       try {
         setLoadingAtividades(true);
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) {
           setAtividadesRecentes([]);
           setLoadingAtividades(false);
@@ -99,7 +101,9 @@ export default function Home() {
 
         const { data: chamados, error: chamadosError } = await supabase
           .from("chamados")
-          .select("id, titulo, status, created_at, categoria, descricao, endereco, foto_url, user_id")
+          .select(
+            "id, titulo, status, created_at, categoria, descricao, endereco, foto_url, user_id",
+          )
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(4);
@@ -128,7 +132,7 @@ export default function Home() {
         const todas = [...chamadosComTipo, ...sugestoesComTipo];
         todas.sort(
           (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
         );
 
         setAtividadesRecentes(todas.slice(0, 4));
@@ -169,10 +173,12 @@ export default function Home() {
 
   const obterStatus = (atividade: Atividade) => {
     if (atividade.tipo === "chamado") {
-      const s = statusChamadoMap[atividade.status as keyof typeof statusChamadoMap];
+      const s =
+        statusChamadoMap[atividade.status as keyof typeof statusChamadoMap];
       return s || { label: "Desconhecido", variant: "outline" };
     } else {
-      const s = statusSugestaoMap[atividade.status as keyof typeof statusSugestaoMap];
+      const s =
+        statusSugestaoMap[atividade.status as keyof typeof statusSugestaoMap];
       return s || { label: "Desconhecido", variant: "outline" };
     }
   };
@@ -181,13 +187,13 @@ export default function Home() {
     if (atividade.tipo === "chamado") {
       return (
         statusColorMap.chamado[
-        atividade.status as keyof typeof statusColorMap.chamado
+          atividade.status as keyof typeof statusColorMap.chamado
         ] || "bg-gray-400"
       );
     } else {
       return (
         statusColorMap.sugestao[
-        atividade.status as keyof typeof statusColorMap.sugestao
+          atividade.status as keyof typeof statusColorMap.sugestao
         ] || "bg-gray-400"
       );
     }
@@ -199,7 +205,10 @@ export default function Home() {
         {/* HEADER */}
         <header className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <Link href="/" className="flex flex-row gap-1 text-xl sm:text-2xl font-bold text-gray-900">
+            <Link
+              href="/"
+              className="flex flex-row gap-1 text-xl sm:text-2xl font-bold text-gray-900"
+            >
               <Image
                 src="/limeira.svg"
                 alt="Logo de Limeira"
@@ -268,7 +277,10 @@ export default function Home() {
           </Button>
         </Link>
 
-        <Link href={user ? "/nova-sugestao" : "/login"} className="block w-full cursor-pointer">
+        <Link
+          href={user ? "/nova-sugestao" : "/login"}
+          className="block w-full cursor-pointer"
+        >
           <Button
             variant="blue"
             className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300 flex items-center justify-center gap-2 mb-6 rounded-xl cursor-pointer"
@@ -338,7 +350,11 @@ export default function Home() {
                 Acompanhe o status dos seus chamados e sugestões
               </p>
               <Link href="/login">
-                <Button variant="outline" size="sm" className="mt-3 hover:bg-gray-100 transition-colors">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-3 hover:bg-gray-100 transition-colors"
+                >
                   Entrar agora
                 </Button>
               </Link>

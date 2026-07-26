@@ -21,11 +21,7 @@ const AvatarImage = React.forwardRef<
   HTMLImageElement,
   React.ImgHTMLAttributes<HTMLImageElement>
 >(({ className, alt, ...props }, ref) => (
-  <img
-    ref={ref}
-    alt={alt}
-    {...props}
-  />
+  <img ref={ref} alt={alt} {...props} />
 ));
 AvatarImage.displayName = "AvatarImage";
 

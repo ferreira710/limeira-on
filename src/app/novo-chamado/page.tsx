@@ -97,7 +97,7 @@ export default function NovoChamadoPage() {
         const { latitude, longitude } = position.coords;
         try {
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=pt`
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=pt`,
           );
           const data = await response.json();
 
@@ -116,14 +116,16 @@ export default function NovoChamadoPage() {
       },
       (error) => {
         console.error("Erro de geolocalização:", error);
-        toast.error("Não foi possível obter sua localização. Verifique as permissões.");
+        toast.error(
+          "Não foi possível obter sua localização. Verifique as permissões.",
+        );
         setIsLoadingAddress(false);
       },
       {
         enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 0,
-      }
+      },
     );
   };
 
